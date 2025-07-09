@@ -34,7 +34,10 @@ export async function POST(req: NextRequest) {
   // Get the assistant's latest message
   const messages = await openai.beta.threads.messages.list(threadId);
   const assistantMessage = messages.data.find((m) => m.role === "assistant");
-  const reply = assistantMessage?.content[0]?.text?.value ?? "No response";
+  const reply =
+    assistantMessage?.content?.[0]?.type === "text"
+      ? (assistantMessage.content[0].text?.value ?? "No response")
+      : "No valid assistant response";
 
   // Prepare the response
   const response = NextResponse.json({ reply });
