@@ -9,16 +9,21 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@types/pdfkit": "^0.14.0",
+    "lucide-react": "^0.525.0",
+    "next": "15.3.4",
+    "openai": "^5.8.2",
+    "pdf-lib": "^1.17.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "next": "15.3.4"
+    "resend": "^4.6.0"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4"
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
