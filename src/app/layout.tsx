@@ -23,7 +23,7 @@ export default function RootLayout({
         <link rel="icon" type="image/png" href="/favicon.png" />
       </Head>
       <body>
-        <main className="h-screen dark text-foreground bg-background">
+        <main className="h-screen bg-white text-foreground bg-background">
           {children}
         </main>
       </body>
