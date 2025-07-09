@@ -1,6 +1,5 @@
 "use client";
 import { NavigationBar } from "@/components/NavBar";
-import { ChatWrapper } from "../../components/ChatWrapper";
 import { Footer } from "@/components/Footer";
 import { Message } from "@/components/Message";
 import { useEffect, useRef, useState } from "react";
