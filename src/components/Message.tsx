@@ -42,7 +42,7 @@ export const Message = ({ content, role, timestamp }: MessageProps) => {
           {role === "user" ? "User" : "Professor"}
         </p>
         <p
-          className={`inline-block w-fit break-words rounded-xl px-4 py-3 text-base font-normal ${
+          className={`text-left inline-block w-fit break-words rounded-xl px-4 py-3 text-base font-normal ${
             role === "assistant"
               ? "text-[#111518] bg-[#f0f3f4]"
               : "text-white bg-[#00B5E8]"
