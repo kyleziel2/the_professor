@@ -1,4 +1,5 @@
 import { Bot, User, GraduationCap } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 interface MessageProps {
   content: string;
@@ -41,15 +42,15 @@ export const Message = ({ content, role, timestamp }: MessageProps) => {
         <p className="text-[#637c88] text-sm font-normal">
           {role === "user" ? "User" : "Professor"}
         </p>
-        <p
+        <div
           className={`text-left inline-block w-fit break-words rounded-xl px-4 py-3 text-base font-normal ${
             role === "assistant"
               ? "text-[#111518] bg-[#f0f3f4]"
               : "text-white bg-[#00B5E8]"
           }`}
         >
-          {content}
-        </p>
+          <ReactMarkdown>{content}</ReactMarkdown>
+        </div>
       </div>
     </div>
   );
