@@ -69,7 +69,7 @@ const HomePage = () => {
       <NavigationBar messages={messages} />
       <div className="sm:px-12 md:px-20 lg:px-56">
         <div className="text-center py-8">
-          <h1 className="text-[#121516] text-[1.5rem] md:text-[2rem] font-bold pb-3 pt-5">
+          <h1 className="text-[#121516] text-[1.5rem] md:text-[2rem] font-bold pb-3 pt-5 px-2">
             AI Professor – Your Workplace
             <span className="text-[#00B5E8]"> EQ Guide</span>
           </h1>
