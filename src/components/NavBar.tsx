@@ -75,7 +75,7 @@ export const NavigationBar = ({ messages }: MessageProps) => {
       <div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#f1f3f4] text-[#121516] text-sm font-bold leading-normal tracking-[0.015em]"
+          className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#00B5E8] text-white text-sm font-bold leading-normal tracking-[0.015em]"
         >
           <Mail className="hidden md:block" />
           <span className="truncate md:ml-4">Send Conversation</span>
