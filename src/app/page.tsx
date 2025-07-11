@@ -67,7 +67,7 @@ const HomePage = () => {
   return (
     <div>
       <NavigationBar messages={messages} />
-      <div className="sm:px-12 md:px-20 lg:px-56">
+      <div className="sm:px-12 md:px-20 lg:px-64">
         <div className="text-center py-8">
           <h1 className="text-[#121516] text-[1.5rem] md:text-[2rem] font-bold pb-3 pt-5 px-2">
             AI Professor – Your Workplace
@@ -115,7 +115,7 @@ const HomePage = () => {
         </div>
         <div className="px-4 py-3 fixed bottom-0 w-full left-0 bg-white">
           <form
-            className="sm:px-12  md:px-20 lg:px-56 py-4"
+            className="sm:px-12  md:px-20 lg:px-64 py-4"
             onSubmit={handleSubmit}
           >
             <label className="flex flex-col min-w-40 h-12 w-full">
