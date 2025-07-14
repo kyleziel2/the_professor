@@ -20,7 +20,7 @@ const HomePage = () => {
   ];
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -113,30 +113,49 @@ const HomePage = () => {
           })}
           {isTyping && <TypingIndicator />}
         </div>
-        <div className="px-4 py-3 fixed bottom-0 w-full left-0 bg-white">
+        <div className="fixed bottom-0 left-0 w-full bg-white px-4 py-3 border-t border-gray-200">
           <form
-            className="sm:px-12  md:px-20 lg:px-64 py-4"
-            onSubmit={handleSubmit}
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit(e);
+              if (inputRef.current) {
+                inputRef.current.style.height = "auto";
+              }
+            }}
+            className="sm:px-12 md:px-20 lg:px-64 py-4"
           >
-            <label className="flex flex-col min-w-40 h-12 w-full">
-              <div className="flex w-full flex-1 items-stretch rounded-xl h-full relative">
-                <input
-                  ref={inputRef}
-                  placeholder="Ask me anything..."
-                  className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#121516] focus:outline-0 focus:ring-0 border-none bg-[#F1F3F4] focus:border-none h-full placeholder:text-[#6a7981] px-4 pr-10 text-base font-normal leading-normal"
-                  onChange={(e) => setMessage(e.target.value)}
-                  value={message}
-                />
+            <div className="flex items-center rounded-xl bg-[#F1F3F4] px-3 py-2 relative">
+              <textarea
+                ref={inputRef}
+                value={message}
+                onChange={(e) => {
+                  setMessage(e.target.value);
+                  const el = e.target;
+                  el.style.height = "auto";
+                  el.style.height = el.scrollHeight + "px";
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault(); // prevent newline
+                    handleSubmit(e); // your submit function
+                    setMessage(""); // clear input
+                    if (inputRef.current) {
+                      inputRef.current.style.height = "auto"; // reset height
+                    }
+                  }
+                }}
+                rows={1}
+                placeholder="Ask me anything..."
+                className="w-full resize-none overflow-hidden bg-transparent border-none text-base text-[#121516] placeholder:text-[#6a7981] focus:outline-none leading-[1.6] pr-10"
+              />
 
-                <button
-                  type="submit"
-                  onClick={handleSubmit}
-                  className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-[#00B5E8] flex items-center justify-center"
-                >
-                  <Send className="w-4 h-4 text-white" />
-                </button>
-              </div>
-            </label>
+              <button
+                type="submit"
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-[#00B5E8] flex items-center justify-center cursor-pointer"
+              >
+                <Send className="w-4 h-4 text-white" />
+              </button>
+            </div>
           </form>
         </div>
       </div>
