@@ -14,9 +14,9 @@ type Message = {
 
 const HomePage = () => {
   const suggestedQuestions: string[] = [
-    "What’s on your mind today?",
-    "How’s work been lately?",
-    "Need support with something emotional at work?",
+    "Hi, I'm new to this. Where do I start?",
+    "I learned about SBNRR last week but I'm struggling to use it when my boss criticizes me in front of others",
+    "I just walked out of a meeting where I completely lost it. Screamed at my team. I might get fired. What do I do?",
   ];
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
