@@ -1,5 +1,6 @@
-import { Bot, User, GraduationCap } from "lucide-react";
+import { User, GraduationCap } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import Image from "next/image";
 
 interface MessageProps {
   content: string;
@@ -20,21 +21,27 @@ const formatDate = (date: Date) => {
 export const Message = ({ content, role, timestamp }: MessageProps) => {
   return (
     <div
-      className={`flex items-end gap-3 p-4 ${
+      className={`flex items-end md:gap-2 gap-1 p-2 ${
         role === "user" ? "flex-row-reverse text-right" : "text-left"
       }`}
     >
       <div
-        className={`flex items-center justify-center w-10 h-10 rounded-full ${
+        className={`flex items-center justify-center rounded-full ${
           role === "assistant"
-            ? "text-[#111518] bg-[#f0f3f4]"
-            : "text-white bg-[#00B5E8]"
+            ? "w-12 h-12"
+            : "text-white bg-[#00B5E8] w-10 h-10"
         }`}
       >
         {role === "user" ? (
           <User className="size-5" />
         ) : (
-          <GraduationCap className="size-5" />
+          <Image
+            src="/professor.jpeg"
+            alt="Assistant avatar"
+            width={80}
+            height={80}
+            className="rounded-full object-cover"
+          />
         )}
       </div>
 

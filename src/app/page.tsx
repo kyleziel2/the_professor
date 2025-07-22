@@ -19,6 +19,8 @@ const HomePage = () => {
     "I just walked out of a meeting where I completely lost it. Screamed at my team. I might get fired. What do I do?",
   ];
 
+  //const suggestedQuestions: string[] = [];
+
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -31,7 +33,7 @@ const HomePage = () => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSubmit = async (e: any) => {
+  /*const handleSubmit = async (e: any) => {
     e.preventDefault();
     if (!message.trim()) return;
     const userMessage = message;
@@ -57,6 +59,68 @@ const HomePage = () => {
       ...prev,
       { content: reply, role: "assistant", timestamp: new Date() },
     ]);
+  };*/
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    if (!message.trim()) return;
+
+    const userMessage = message;
+    setMessage("");
+    setIsTyping(true);
+
+    // Step 1: Add user message + placeholder for assistant
+    const newMessages = [
+      ...messages,
+      { content: userMessage, role: "user", timestamp: new Date() },
+      { content: "", role: "assistant", timestamp: new Date() },
+    ];
+    setMessages(newMessages);
+
+    // Step 2: Send message to API
+    const res = await fetch("/api/assistant", {
+      method: "POST",
+      body: JSON.stringify({ message: userMessage, threadId }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    let fullReply = "";
+    const reader = res.body?.getReader();
+    const decoder = new TextDecoder();
+
+    // Step 3: Read streamed response and update last assistant message
+    if (reader) {
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+
+        if (chunk.startsWith("__THREAD_ID__:")) {
+          const currentThread = chunk.replace("__THREAD_ID__:", "").trim();
+          setThreadId(currentThread);
+          continue;
+        }
+
+        fullReply += chunk;
+
+        setMessages((prev) => {
+          const updated = [...prev];
+          const lastIndex = updated.length - 1;
+          if (updated[lastIndex]?.role === "assistant") {
+            updated[lastIndex] = {
+              ...updated[lastIndex],
+              content: fullReply,
+            };
+          }
+          return updated;
+        });
+      }
+    }
+
+    setIsTyping(false);
   };
 
   const getLastUserMessageIndex = () => {
@@ -77,25 +141,29 @@ const HomePage = () => {
           </h1>
           <h5>Ask questions, get support, grow professionally</h5>
         </div>
-        <div>
-          <h5 className="text-[#121516] text-lg font-semibold px-4 pb-2 pt-4">
-            Suggested Questions
-          </h5>
-          <div className="flex gap-3 p-3 flex-wrap pr-4">
-            {suggestedQuestions.map((question, index) => (
-              <div
-                key={index}
-                onClick={() => {
-                  setMessage(question);
-                  inputRef.current?.focus();
-                }}
-                className="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#F1F3F4] pl-4 pr-4 cursor-pointer"
-              >
-                <p className="text=[#121516] text-sm font-medium">{question}</p>
-              </div>
-            ))}
+        {!messages.length && (
+          <div>
+            <h5 className="text-[#121516] text-lg font-semibold px-4 pb-2 pt-4">
+              Suggested Questions
+            </h5>
+            <div className="flex gap-3 p-3 flex-wrap pr-4">
+              {suggestedQuestions.map((question, index) => (
+                <div
+                  key={index}
+                  onClick={() => {
+                    setMessage(question);
+                    inputRef.current?.focus();
+                  }}
+                  className="flex h-auto py-2 px-4 max-w-full flex-wrap shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#F1F3F4] cursor-pointer"
+                >
+                  <p className="text=[#121516] text-xs md:text-sm font-medium break-words whitespace-normal">
+                    {question}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
         <div>
           {messages.map((message, index) => {
             return (
@@ -105,11 +173,13 @@ const HomePage = () => {
                   index === getLastUserMessageIndex() ? bottomRef : undefined
                 }
               >
-                <Message
-                  content={message.content}
-                  role={message.role}
-                  timestamp={message.timestamp}
-                />
+                {message.content && (
+                  <Message
+                    content={message.content}
+                    role={message.role}
+                    timestamp={message.timestamp}
+                  />
+                )}
               </div>
             );
           })}
