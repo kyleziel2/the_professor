@@ -22,6 +22,7 @@ const HomePage = () => {
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
+  const [threadId, setThreadId] = useState("");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
@@ -43,10 +44,11 @@ const HomePage = () => {
     const typingTimeout = setTimeout(() => setIsTyping(true), 1000);
     const res = await fetch("/api/assistant", {
       method: "POST",
-      body: JSON.stringify({ message: userMessage }),
+      body: JSON.stringify({ message: userMessage, threadId }),
     });
     const data = await res.json();
     const reply = data.reply;
+    setThreadId(data.threadId);
 
     clearTimeout(typingTimeout);
     setIsTyping(false);

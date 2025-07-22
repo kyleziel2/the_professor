@@ -74,7 +74,7 @@ export const NavigationBar = ({ messages }: MessageProps) => {
       <Image src="/logo.png" alt="company logo" width="80" height="20" />
       <div>
         <button
-          onClick={() => setIsModalOpen(false)}
+          onClick={() => setIsModalOpen(true)}
           className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#00B5E8] text-white text-sm font-bold leading-normal tracking-[0.015em]"
         >
           <Mail className="hidden md:block" />

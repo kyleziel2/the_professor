@@ -7,10 +7,10 @@ const openai = new OpenAI({
 });
 
 export async function POST(req: NextRequest) {
-  const { message } = await req.json();
-  const cookieStore = cookies();
+  let { message, threadId } = await req.json();
+  //const cookieStore = cookies();
 
-  let threadId = (await cookieStore).get("threadId")?.value;
+  //let threadId = (await cookieStore).get("threadId")?.value;
   let isNewThread = false;
 
   // Create a new thread if not found
@@ -40,16 +40,16 @@ export async function POST(req: NextRequest) {
       : "No valid assistant response";
 
   // Prepare the response
-  const response = NextResponse.json({ reply });
+  const response = NextResponse.json({ reply, threadId });
 
   // Set threadId cookie if it's a new thread
-  if (isNewThread) {
+  /*if (isNewThread) {
     response.cookies.set("threadId", threadId, {
       httpOnly: false,
       path: "/",
       sameSite: "lax",
     });
-  }
+  }*/
 
   return response;
 }
