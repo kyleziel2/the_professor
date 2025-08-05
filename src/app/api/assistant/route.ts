@@ -9,6 +9,7 @@ const openai = new OpenAI({
 
 export async function POST(req: NextRequest) {
   let { message, threadId } = await req.json();
+
   //const cookieStore = cookies();
 
   //let threadId = (await cookieStore).get("threadId")?.value;

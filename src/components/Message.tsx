@@ -1,5 +1,6 @@
-import { User, GraduationCap } from "lucide-react";
+import { User } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import Image from "next/image";
 
 interface MessageProps {
@@ -56,7 +57,21 @@ export const Message = ({ content, role, timestamp }: MessageProps) => {
               : "text-white bg-[#00B5E8]"
           }`}
         >
-          <ReactMarkdown>{content}</ReactMarkdown>
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              p: ({ node, ...props }) => (
+                <p
+                  style={{
+                    marginBottom: role === "assistant" ? "1.4rem" : "0",
+                  }}
+                  {...props}
+                />
+              ),
+            }}
+          >
+            {content}
+          </ReactMarkdown>
         </div>
       </div>
     </div>

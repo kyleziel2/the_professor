@@ -100,6 +100,7 @@ const HomePage = () => {
 
         if (chunk.startsWith("__THREAD_ID__:")) {
           const currentThread = chunk.replace("__THREAD_ID__:", "").trim();
+          console.log(`reply: ${threadId}`);
           setThreadId(currentThread);
           continue;
         }
