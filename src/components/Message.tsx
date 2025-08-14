@@ -19,6 +19,10 @@ const formatDate = (date: Date) => {
   return timeString;
 };
 
+function removeBrackets(text: string) {
+  return text.replace(/【.*?】/g, "");
+}
+
 export const Message = ({ content, role, timestamp }: MessageProps) => {
   return (
     <div
@@ -70,7 +74,7 @@ export const Message = ({ content, role, timestamp }: MessageProps) => {
               ),
             }}
           >
-            {content}
+            {removeBrackets(content)}
           </ReactMarkdown>
         </div>
       </div>

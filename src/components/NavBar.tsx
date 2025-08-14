@@ -27,7 +27,7 @@ export const NavigationBar = ({ messages }: MessageProps) => {
   };
 
   return (
-    <header className="flex items-center justify-between border-b border-solid border-b-[#F1F3F4] px-4 md:px-10 py-3">
+    <header className="sticky top-0 z-50 bg-white flex items-center justify-between border-b border-solid border-b-[#F1F3F4] px-4 md:px-10 py-3">
       {isModalOpen && (
         <Modal
           isOpen={isModalOpen}

@@ -5,6 +5,7 @@ import { Message } from "@/components/Message";
 import { useEffect, useRef, useState } from "react";
 import { TypingIndicator } from "@/components/TypingLoader";
 import { Send } from "lucide-react";
+import { BeatLoader, MoonLoader, PuffLoader } from "react-spinners";
 
 type Message = {
   content: string;
@@ -100,7 +101,6 @@ const HomePage = () => {
 
         if (chunk.startsWith("__THREAD_ID__:")) {
           const currentThread = chunk.replace("__THREAD_ID__:", "").trim();
-          console.log(`reply: ${threadId}`);
           setThreadId(currentThread);
           continue;
         }
@@ -173,6 +173,9 @@ const HomePage = () => {
                 ref={
                   index === getLastUserMessageIndex() ? bottomRef : undefined
                 }
+                className={
+                  index === getLastUserMessageIndex() ? `scroll-mt-24` : ``
+                }
               >
                 {message.content && (
                   <Message
@@ -224,9 +227,14 @@ const HomePage = () => {
 
               <button
                 type="submit"
+                disabled={isTyping}
                 className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-[#00B5E8] flex items-center justify-center cursor-pointer"
               >
-                <Send className="w-4 h-4 text-white" />
+                {isTyping ? (
+                  <PuffLoader color="#FFF" size={20} />
+                ) : (
+                  <Send className="w-4 h-4 text-white" />
+                )}
               </button>
             </div>
           </form>
