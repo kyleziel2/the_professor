@@ -1,12 +1,13 @@
+// Force Node.js runtime for OpenAI streaming compatibility
 export const runtime = "nodejs";
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import OpenAI from "openai";
+import { openai } from "@/app/lib/openai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-});
-
+/**
+ * Main chat endpoint that handles streaming responses from OpenAI Assistant
+ * Creates new threads as needed and streams responses back to client
+ */
 export async function POST(req: NextRequest) {
   let { message, threadId } = await req.json();
 
@@ -15,14 +16,14 @@ export async function POST(req: NextRequest) {
   //let threadId = (await cookieStore).get("threadId")?.value;
   let isNewThread = false;
 
-  // Create a new thread if not found
+  // Create a new OpenAI thread if none exists (each conversation needs a thread)
   if (!threadId) {
     const thread = await openai.beta.threads.create();
     threadId = thread.id;
     isNewThread = true;
   }
 
-  // Add user message to thread
+  // Add the user's message to the OpenAI thread
   await openai.beta.threads.messages.create(threadId, {
     role: "user",
     content: message,
@@ -30,20 +31,21 @@ export async function POST(req: NextRequest) {
 
   const encoder = new TextEncoder();
 
-  // Run assistant and wait for completion
-  /*const run = await openai.beta.threads.runs.createAndPoll(threadId, {
-    assistant_id: process.env.ASSISTANT_ID!,
-  });*/
-
+  // Stream the assistant's response in real-time using OpenAI's streaming API
   const stream = new ReadableStream({
     async start(controller) {
       try {
+        // Create streaming run with the assistant
         const runStream = await openai.beta.threads.runs.stream(threadId, {
           assistant_id: process.env.ASSISTANT_ID!,
         });
+        
+        // Send threadId first so client can track conversation
         controller.enqueue(encoder.encode(`__THREAD_ID__:${threadId}\n`));
 
+        // Process each streaming event from OpenAI
         for await (const event of runStream) {
+          // Only handle text message deltas (incremental text chunks)
           if (event.event === "thread.message.delta") {
             const delta = event.data.delta;
             const text =
@@ -52,6 +54,7 @@ export async function POST(req: NextRequest) {
                 : "No valid assistant response";
 
             if (text) {
+              // Stream each text chunk to the client
               controller.enqueue(encoder.encode(text));
             }
           }
@@ -65,33 +68,32 @@ export async function POST(req: NextRequest) {
     },
   });
 
+  // Return streaming response with proper headers for SSE-like behavior
   return new Response(stream, {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "no-cache",
-      Connection: "keep-alive",
+      "Cache-Control": "no-cache", // Prevent caching of streaming responses
+      Connection: "keep-alive", // Keep connection open for streaming
     },
   });
 
-  // Get the assistant's latest message
-  /*const messages = await openai.beta.threads.messages.list(threadId);
+  /* Legacy non-streaming implementation - kept for reference
+  const messages = await openai.beta.threads.messages.list(threadId);
   const assistantMessage = messages.data.find((m) => m.role === "assistant");
   const reply =
     assistantMessage?.content?.[0]?.type === "text"
       ? (assistantMessage.content[0].text?.value ?? "No response")
       : "No valid assistant response";
 
-  // Prepare the response
   const response = NextResponse.json({ reply, threadId });
 
-  // Set threadId cookie if it's a new thread
-  /*if (isNewThread) {
+  // Cookie-based thread tracking (replaced with client-side storage)
+  if (isNewThread) {
     response.cookies.set("threadId", threadId, {
       httpOnly: false,
       path: "/",
       sameSite: "lax",
     });
-  }*/
-
-  //return response;
+  }
+  */
 }
