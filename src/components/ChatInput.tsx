@@ -108,26 +108,6 @@ export const ChatInput = ({
 
             {/* Right side buttons container */}
             <div className="absolute right-2 bottom-2 flex items-center space-x-2">
-              {/* Attachment button */}
-              <button
-                type="button"
-                disabled={isTyping}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-150 disabled:opacity-50"
-                title="Attach file"
-              >
-                <Paperclip size={18} />
-              </button>
-
-              {/* Voice input button */}
-              <button
-                type="button"
-                disabled={isTyping}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-150 disabled:opacity-50"
-                title="Voice input"
-              >
-                <Mic size={18} />
-              </button>
-
               {/* Submit/Stop button */}
               <button
                 type="submit"
