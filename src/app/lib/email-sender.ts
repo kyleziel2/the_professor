@@ -36,7 +36,7 @@ export async function sendPDFtoEmail(pdfBuffer: Buffer, toEmail: string) {
       {
         filename: `conversation-${new Date().toISOString().split('T')[0]}.pdf`,
         content: pdfBuffer,
-        type: "application/pdf",
+        contentType: "application/pdf",
       },
     ],
   });
