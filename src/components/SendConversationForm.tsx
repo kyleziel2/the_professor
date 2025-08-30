@@ -38,6 +38,8 @@ export function SendConversationForm({
       const { error } = resData;
       if (error) {
         toast.error("There was a problem sending your mail");
+      } else {
+        toast.success("Conversation sent successfully!");
       }
 
       setIsModalOpen(false);

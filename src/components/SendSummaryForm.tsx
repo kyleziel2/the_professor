@@ -38,6 +38,8 @@ export function SendSummaryForm({
       const { error } = resData;
       if (error) {
         toast.error("There was a problem sending your mail");
+      } else {
+        toast.success("Summary sent successfully!");
       }
 
       setIsModalOpen(false);

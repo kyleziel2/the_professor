@@ -23,6 +23,10 @@ function removeBrackets(text: string) {
   return text.replace(/【.*?】/g, "");
 }
 
+function removeFileExtensions(text: string) {
+  return text.replace(/\b\w+\.\w{2,4}\b/g, "");
+}
+
 export const Message = ({ content, role, timestamp }: MessageProps) => {
   return (
     <div
@@ -74,7 +78,7 @@ export const Message = ({ content, role, timestamp }: MessageProps) => {
               ),
             }}
           >
-            {removeBrackets(content)}
+            {removeFileExtensions(removeBrackets(content))}
           </ReactMarkdown>
         </div>
       </div>
