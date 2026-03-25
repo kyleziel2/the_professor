@@ -1,6 +1,10 @@
 // Force Node.js runtime for streaming compatibility
 export const runtime = "nodejs";
 
+// Increase max duration to prevent timeouts on longer conversations
+// Vercel Pro allows up to 300s; Hobby allows 60s
+export const maxDuration = 60;
+
 import { NextRequest } from "next/server";
 import { openai, MODEL } from "@/app/lib/openai";
 import { assembleSystemPrompt, getDefaultGuideId } from "@/prompts/assembler";
@@ -15,13 +19,49 @@ type ChatMessage = {
 };
 
 /**
+ * Maximum number of recent messages to send to the API.
+ * This controls cost and prevents timeouts on long conversations.
+ *
+ * The trimming strategy:
+ * - Always keep the FIRST user message (establishes context/intent)
+ * - Always keep the LAST N messages (recent conversation flow)
+ * - Drop middle messages when the conversation exceeds the limit
+ *
+ * 20 messages = ~10 back-and-forth exchanges, which is plenty
+ * for the model to maintain conversational coherence.
+ */
+const MAX_CONVERSATION_MESSAGES = 20;
+
+/**
+ * Trims conversation history to control token usage while preserving context.
+ * Keeps the first user message (for intent/context) and the most recent messages.
+ */
+function trimConversationHistory(messages: ChatMessage[]): ChatMessage[] {
+  if (messages.length <= MAX_CONVERSATION_MESSAGES) {
+    return messages;
+  }
+
+  // Always keep the first user message for context
+  const firstUserMessage = messages.find((m) => m.role === "user");
+  const recentMessages = messages.slice(-MAX_CONVERSATION_MESSAGES);
+
+  // If the first user message is already in the recent window, just return recent
+  if (!firstUserMessage || recentMessages.includes(firstUserMessage)) {
+    return recentMessages;
+  }
+
+  // Otherwise, prepend the first user message to the recent window
+  return [firstUserMessage, ...recentMessages];
+}
+
+/**
  * Main chat endpoint — streams responses from OpenAI Responses API.
  *
- * Key architectural changes from the Assistants API version:
+ * Architecture:
  * 1. No threads — conversation history comes from the frontend
  * 2. System prompt is assembled from Core Identity + Conversation Guide
- * 3. Uses OpenAI Responses API (not Assistants API)
- * 4. Streams using response.output_text.delta events
+ * 3. Conversation history is trimmed to control cost and prevent timeouts
+ * 4. Uses OpenAI Responses API with streaming
  */
 export async function POST(req: NextRequest) {
   const { messages, guideId } = (await req.json()) as {
@@ -30,14 +70,14 @@ export async function POST(req: NextRequest) {
   };
 
   // Assemble the system prompt: Core Identity + selected Guide
-  // Phase 1: Uses default guide (Values Clarification)
-  // Phase 2: guideId will come from intent detection on the frontend or first message
   const selectedGuide = guideId || getDefaultGuideId();
   const systemPrompt = assembleSystemPrompt(selectedGuide);
 
-  // Convert our message history to the format the Responses API expects.
-  // The Responses API accepts an array of {role, content} objects in the `input` field.
-  const input = messages.map((msg) => ({
+  // Trim conversation history to control cost and prevent timeouts
+  const trimmedMessages = trimConversationHistory(messages);
+
+  // Convert to the format the Responses API expects
+  const input = trimmedMessages.map((msg) => ({
     role: msg.role as "user" | "assistant",
     content: msg.content,
   }));
@@ -57,7 +97,6 @@ export async function POST(req: NextRequest) {
 
         // Process streaming events from the Responses API
         for await (const event of stream) {
-          // Listen for text delta events — these contain the incremental text chunks
           if (event.type === "response.output_text.delta") {
             const text = event.delta;
             if (text) {
@@ -65,7 +104,6 @@ export async function POST(req: NextRequest) {
             }
           }
 
-          // Handle errors from the stream
           if (event.type === "error") {
             console.error("Stream error event:", event);
             controller.enqueue(
@@ -89,7 +127,6 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  // Return streaming response with proper headers
   return new Response(readableStream, {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
