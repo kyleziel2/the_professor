@@ -7,15 +7,15 @@ import { SendSummaryForm } from "./SendSummaryForm";
 
 interface MessageProps {
   messages: any;
-  threadId: string;
 }
 
 /**
  * Sticky navigation bar with logo and email export buttons
  * Manages modal states for sending conversation PDFs and AI-generated summaries
+ *
+ * KEY CHANGE: No more threadId prop — summary form now receives messages directly.
  */
-export const NavigationBar = ({ messages, threadId }: MessageProps) => {
-  // Modal visibility state for the two email features
+export const NavigationBar = ({ messages }: MessageProps) => {
   const [isConversationModalOpen, setIsConversationModalOpen] = useState(false);
   const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
 
@@ -32,14 +32,14 @@ export const NavigationBar = ({ messages, threadId }: MessageProps) => {
         <SendSummaryForm
           isModalOpen={isSummaryModalOpen}
           setIsModalOpen={setIsSummaryModalOpen}
-          threadId={threadId}
+          messages={messages}
         />
       )}
       <div>
         <Image src="/logo.png" alt="company logo" width="80" height="20" />
       </div>
       <div className="flex items-center gap-2 sm:gap-4">
-        {/* AI Summary Email Button - generates and emails conversation summary */}
+        {/* AI Summary Email Button */}
         <button
           onClick={() => setIsSummaryModalOpen(true)}
           className="flex cursor-pointer items-center justify-center overflow-hidden rounded-full px-2 py-1 sm:px-4 sm:py-2 bg-white text-[#00B5E8] text-xs md:text-sm font-bold border-2 border-[#00B5E8] leading-normal tracking-[0.015em]"
@@ -50,7 +50,7 @@ export const NavigationBar = ({ messages, threadId }: MessageProps) => {
           </span>
         </button>
 
-        {/* PDF Conversation Export Button - emails full chat as PDF */}
+        {/* PDF Conversation Export Button */}
         <button
           onClick={() => setIsConversationModalOpen(true)}
           className="flex cursor-pointer items-center justify-center overflow-hidden rounded-full px-2 py-1 sm:px-4 sm:py-2 bg-[#00B5E8] text-white text-xs md:text-sm font-bold border-2 border-[#00B5E8] leading-normal tracking-[0.015em]"

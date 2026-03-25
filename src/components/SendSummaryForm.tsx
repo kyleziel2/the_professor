@@ -6,17 +6,19 @@ import { useState } from "react";
 type SendFormProps = {
   isModalOpen: boolean;
   setIsModalOpen: (val: boolean) => void;
-  threadId: string;
+  messages: any[];
 };
 
 /**
- * Modal form for generating and emailing AI-powered conversation summaries
- * Uses threadId to fetch conversation history and generate intelligent summary via OpenAI
+ * Modal form for generating and emailing AI-powered conversation summaries.
+ *
+ * KEY CHANGE: Now sends messages array instead of threadId.
+ * The backend generates the summary directly from the conversation history.
  */
 export function SendSummaryForm({
   isModalOpen,
   setIsModalOpen,
-  threadId,
+  messages,
 }: SendFormProps) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -26,12 +28,22 @@ export function SendSummaryForm({
       setIsLoading(true);
 
       const formData = new FormData(e.currentTarget);
-
       const email = formData.get("email") as string;
+
+      // Send messages (role + content only) to the summary endpoint
+      const apiMessages = messages
+        .filter((m: any) => m.content && m.content.trim() !== "")
+        .map((m: any) => ({
+          role: m.role,
+          content: m.content,
+        }));
 
       const res = await fetch("/api/send-summary", {
         method: "POST",
-        body: JSON.stringify({ threadId, toEmail: email }),
+        body: JSON.stringify({ messages: apiMessages, toEmail: email }),
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
 
       const resData = await res.json();

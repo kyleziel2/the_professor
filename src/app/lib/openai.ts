@@ -1,7 +1,10 @@
 import OpenAI from "openai";
 
 // Centralized OpenAI client instance
-// Used across all API routes for Assistants API (threads, messages, runs)
+// Used across all API routes for the Responses API
 export const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!, // API key from environment variables
+  apiKey: process.env.OPENAI_API_KEY!,
 });
+
+// Model configuration — change this in one place
+export const MODEL = process.env.OPENAI_MODEL || "gpt-4.1";
